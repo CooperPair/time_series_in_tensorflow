@@ -11,31 +11,27 @@ import tensorflow.contrib.metrics as metrics
 import tensorflow.contrib.rnn as rnn
 from matplotlib import pyplot
 
-data = pd.read_csv("YES.csv")
+data = pd.read_csv("YESBANK5.csv")
 
 
 #prepearin the data for standirisation
-ts = data['Close Price']
-print("When taking without array value\n")
-print("ts")
-print(ts)
-TS = np.array(ts)
-print("TS")
-print(TS)
-len(TS)
+ts = data['Close']
+
+ts_mean = ts-ts.mean()
+ts_var = ts/ts.var()
+
+
+TS = np.array(ts_var)
+
+
 num_periods = 20
 f_horizon = 1 #forecast horizon one priod into the future
 
 x_data = TS[:(len(TS)-(len(TS)%num_periods))]#making a bunch of 140 sets
-print("x_data")
-print(x_data)
 x_batches = x_data.reshape(-1, 20 ,1)#reshaping the dimwnsion of the datasets with 20 bunch of 7 sets
-print("x_ batches")
-print(x_batches)
+
 
 y_data = TS[1:(len(TS)-(len(TS)%num_periods))+f_horizon]
-print("y_data")
-print(y_data)
 y_batches = y_data.reshape(-1,20,1)
 #print(len(x_batches))
 #print(x_batches.shape)
@@ -100,7 +96,7 @@ init = tf.global_variables_initializer()
 
 
 #implementing model on our training data
-epochs = 5600 #forward + backward = 1 epochs
+epochs = 1000 #forward + backward = 1 epochs
 
 #tf.Session() it is the graph object
 with tf.Session() as sess:
