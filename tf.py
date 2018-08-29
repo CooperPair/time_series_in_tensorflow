@@ -10,16 +10,23 @@ from tensorflow.contrib.learn.python.learn import learn_runner
 import tensorflow.contrib.metrics as metrics
 import tensorflow.contrib.rnn as rnn
 from matplotlib import pyplot
+from sklearn.preprocessing import MinMaxScaler
 
-data = pd.read_csv("YESBANK5.csv")
+data = pd.read_csv("YESBANK10.csv")
+
 
 
 #prepearin the data for standirisation
 ts = data['Close']
 
+
+
+
+
 ts_mean = ts-ts.mean()
 ts_var = ts/ts.var()
 
+print(ts_var)
 
 TS = np.array(ts_var)
 
@@ -33,11 +40,6 @@ x_batches = x_data.reshape(-1, 20 ,1)#reshaping the dimwnsion of the datasets wi
 
 y_data = TS[1:(len(TS)-(len(TS)%num_periods))+f_horizon]
 y_batches = y_data.reshape(-1,20,1)
-#print(len(x_batches))
-#print(x_batches.shape)
-#print(x_batches[0:2])
-
-#print(y_batches)
 
 def test_data(series, forecast, num_periods):
 	test_x_setup = TS[-(num_periods + forecast):]
