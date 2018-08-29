@@ -11,22 +11,20 @@ import tensorflow.contrib.metrics as metrics
 import tensorflow.contrib.rnn as rnn
 from matplotlib import pyplot
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import StandardScaler
+import sys
+import common
+import crayons
+from pandas import Series
 
-data = pd.read_csv("YESBANK10.csv")
 
+data = pd.read_csv(sys.argv[1])
 
 
 #prepearin the data for standirisation
-ts = data['Close']
-
-
-
-
-
+ts = data['Adj Close']
 ts_mean = ts-ts.mean()
 ts_var = ts/ts.var()
-
-print(ts_var)
 
 TS = np.array(ts_var)
 
@@ -34,8 +32,8 @@ TS = np.array(ts_var)
 num_periods = 20
 f_horizon = 1 #forecast horizon one priod into the future
 
-x_data = TS[:(len(TS)-(len(TS)%num_periods))]#making a bunch of 140 sets
-x_batches = x_data.reshape(-1, 20 ,1)#reshaping the dimwnsion of the datasets with 20 bunch of 7 sets
+x_data = TS[:(len(TS)-(len(TS)%num_periods))]#making a bunch of sets
+x_batches = x_data.reshape(-1, 20 ,1)#reshaping the dimwnsion of the datasets
 
 
 y_data = TS[1:(len(TS)-(len(TS)%num_periods))+f_horizon]
@@ -49,9 +47,11 @@ def test_data(series, forecast, num_periods):
 
 X_test , Y_test = test_data(TS, f_horizon, num_periods)
 
-print(X_test.shape)
-#print(x_test)
-
+print(Y_test.shape)
+print(Y_test)
+y1 = np.reshape(Y_test, 20)
+y = pd.Series(y1)
+print(y)
 #this would reset the graph
 tf.reset_default_graph()
 
@@ -112,6 +112,21 @@ with tf.Session() as sess:
 	y_pred = sess.run(outputs, feed_dict={X:X_test})
 
 	print(y_pred)
+y2 = np.reshape(y_pred, 20)
+y3 = pd.Series(y2)
+print(crayons.blue("[*] Finding the actual trend."))
+ACTUAL_TRENDS = common.find_trend(y, y)
+print(crayons.blue("[*] Finding predicted trend."))
+PREDICTED_TRENDS = common.find_trend(y3, y)
+print(crayons.blue("[*] Calculating accuracy of the prediction."))
+correct_pred, incorrect_pred = common.accuracy(PREDICTED_TRENDS, ACTUAL_TRENDS)
+
+pred_accuracy = (correct_pred/len(PREDICTED_TRENDS))*100
+
+
+print(pred_accuracy)
+
+
 
 
 #plotting the data
