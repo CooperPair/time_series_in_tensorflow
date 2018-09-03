@@ -33,6 +33,7 @@ def net_pnl(predictions, original, predicted_trends):
     while i < len(predictions):
 
         # Otherwise a key error would happen
+        original = pd.Series(original)
         if i + 1 == len(original.values):
             break
 
