@@ -111,24 +111,20 @@ with tf.Session() as sess:
 	ypred = np.reshape(y_pred, 20)
 	#print(ypred)
 
-
-#to do !-- the tak of generating the result accuracy on the basis of up and down
 	print(crayons.blue("[*] Finding the actual trend."))
 	ACTUAL_TRENDS = common.find_trend(y1, y1)
 	print(crayons.blue("[*] Finding predicted trend."))
 	PREDICTED_TRENDS = common.find_trend(ypred, y1)
-	print(crayons.blue("[*] Calculating accuracy of the prediction."))
 	correct_pred, incorrect_pred = common.accuracy(PREDICTED_TRENDS, ACTUAL_TRENDS)
 	pred_accuracy = (correct_pred/len(PREDICTED_TRENDS))*100
-	print(crayons.blue("[*] Finding Net PnL."))
 	PNL = common.net_pnl(ypred, y1, PREDICTED_TRENDS)
 	net_pnl = round(sum(PNL), 2)
-	print(net_pnl)
-	'''
-	print(crayons.yellow(f'[*] No. of correct prediction : {correct_pred}', bold=True))
-	print(crayons.yellow(f'[*] No. of incorrect prediction : {incorrect_pred}', bold=True))
-	print(crayons.yellow(f'[*] Prediction Accuracy : {pred_accuracy} %', bold=True))
-	'''
+	print('{} is the number of correct predictions'.format(crayons.red(correct_pred)))
+	print('{} is the number of incorrect predictions'.format(crayons.red(incorrect_pred)))
+	print(crayons.blue("[*] Finding Net PnL."))
+	print('{} is the net Pnl'.format(crayons.red(net_pnl)))
+	print(crayons.blue("[*] Calculating accuracy of the prediction."))
+	print('{} is the accuracy'.format(crayons.red(pred_accuracy)))
 #plotting the data
 # Plot
 actual_line = pyplot.plot(np.ravel(Y_test), marker='s', label='Actual Price')
