@@ -58,7 +58,7 @@ tf.reset_default_graph()
 
 num_periods = 20
 inputs = 1
-hidden =100
+hidden =500
 output = 1
 
 #creating the variable object
