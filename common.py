@@ -1,15 +1,21 @@
 '''
 Implementing all accuracy for the model
 '''
+import tensorflow as tf
+import pandas as pd
+from pandas import Series
+import numpy as np
 
 
 def find_trend(comparison_dataset, base_dataset):
     j = 0
     trend = list()
-    while j < len(base_dataset.values):
+    while j < len(base_dataset):
         # Check whether the index is out of range or not
         # If yes then exit the loop
-        if j + 1 == len(base_dataset.eval().values):
+        base_dataset = np.reshape(base_dataset, len(base_dataset))
+        base_dataset = pd.Series(base_dataset)
+        if j + 1 == len(base_dataset.values):
             break
 
         if comparison_dataset[j] < comparison_dataset[j + 1]:
@@ -56,4 +62,3 @@ def accuracy(predicted_trend, actual_trend):
         i += 1
 
     return correct_pred, incorrect_pred
-

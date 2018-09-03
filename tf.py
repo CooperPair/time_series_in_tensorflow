@@ -1,6 +1,7 @@
 import tensorflow as tf
 import pandas as pd
 import numpy as np
+from numpy import mean
 import os
 import matplotlib.pyplot as plt
 import shutil
@@ -12,21 +13,22 @@ import tensorflow.contrib.rnn as rnn
 from matplotlib import pyplot
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import accuracy_score
 import sys
 import common
 import crayons
 from pandas import Series
 
-
+#input data from the command shell
 data = pd.read_csv(sys.argv[1])
 
 
-#prepearin the data for standirisation
+#prepearing data for standirisation
 ts = data['Adj Close']
 ts_mean = ts-ts.mean()
 ts_var = ts/ts.var()
 
-TS = np.array(ts_var)
+TS = np.array(ts)
 
 
 num_periods = 20
@@ -49,8 +51,9 @@ X_test , Y_test = test_data(TS, f_horizon, num_periods)
 
 print(Y_test.shape)
 print(Y_test)
-y1 = np.reshape(Y_test, 20)
+y1 = np.reshape(Y_test, 20)#reshape the data into 1d
 y = pd.Series(y1)
+n = len(y)
 print(y)
 #this would reset the graph
 tf.reset_default_graph()
@@ -95,11 +98,9 @@ training_op = optimizer.minimize(loss)
 #initialize all variables 
 init = tf.global_variables_initializer()
 
-
-
 #implementing model on our training data
 epochs = 1000 #forward + backward = 1 epochs
-
+scores = list()
 #tf.Session() it is the graph object
 with tf.Session() as sess:
 	init.run()
@@ -107,28 +108,25 @@ with tf.Session() as sess:
 		sess.run(training_op, feed_dict={X:x_batches, y:y_batches})
 		if ep%100 == 0:
 			mse = loss.eval(feed_dict={X:x_batches ,y:y_batches})
-			print(ep ,"\tMSE", mse)
-
+			print(ep ,"\tMSE", mse)#this item we have to run for optimizing the error.
 	y_pred = sess.run(outputs, feed_dict={X:X_test})
-
-	print(y_pred)
-y2 = np.reshape(y_pred, 20)
-y3 = pd.Series(y2)
-print(crayons.blue("[*] Finding the actual trend."))
-ACTUAL_TRENDS = common.find_trend(y, y)
-print(crayons.blue("[*] Finding predicted trend."))
-PREDICTED_TRENDS = common.find_trend(y3, y)
-print(crayons.blue("[*] Calculating accuracy of the prediction."))
-correct_pred, incorrect_pred = common.accuracy(PREDICTED_TRENDS, ACTUAL_TRENDS)
-
-pred_accuracy = (correct_pred/len(PREDICTED_TRENDS))*100
-
-
-print(pred_accuracy)
+	ypred = np.reshape(y_pred, 20)
+	print(ypred)
 
 
 
 
+#to do !-- the tak of generating the result accuracy on the basis of up and down
+	print(crayons.blue("[*] Finding the actual trend."))
+	ACTUAL_TRENDS = common.find_trend(y1, y1)
+	print(crayons.blue("[*] Finding predicted trend."))
+	PREDICTED_TRENDS = common.find_trend(ypred, y1)
+	print(crayons.blue("[*] Calculating accuracy of the prediction."))
+	correct_pred, incorrect_pred = common.accuracy(PREDICTED_TRENDS, ACTUAL_TRENDS)
+	pred_accuracy = (correct_pred/len(PREDICTED_TRENDS))*100
+	print(pred_accuracy)
+
+'''
 #plotting the data
 # Plot
 actual_line = pyplot.plot(np.ravel(Y_test), marker='s', label='Actual Price')
@@ -138,4 +136,4 @@ pyplot.ylabel('Price')
 pyplot.xlabel('Date')
 pyplot.title('Forecast Results')
 pyplot.grid()
-pyplot.show()
+pyplot.show()'''
