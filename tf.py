@@ -34,7 +34,7 @@ num_periods = 20
 f_horizon = 1 #forecast horizon one priod into the future
 
 x_data = TS[:(len(TS)-(len(TS)%num_periods))]#making a bunch of sets
-x_batches = x_data.reshape(-1, 20 ,1)#reshaping the dimwnsion of the datasets
+x_batches = x_data.reshape(-1, 20 ,1)#reshaping the dimension of the datasets
 
 
 y_data = TS[1:(len(TS)-(len(TS)%num_periods))+f_horizon]
@@ -50,15 +50,15 @@ X_test , Y_test = test_data(TS, f_horizon, num_periods)
 
 print(Y_test.shape)
 print(Y_test)
-y1 = np.reshape(Y_test, 20)#reshape the data into 1d
-y = pd.Series(y1)
+y1 = np.reshape(Y_test, 20)#reshape the data into 1-D
+y = pd.Series(y1)#it reshape the data into single dimension data
 
 #this would reset the graph
 tf.reset_default_graph()
 
 num_periods = 20
 inputs = 1
-hidden =500
+hidden =500     #no of nodes in each hidden layer
 output = 1
 
 #creating the variable object
@@ -66,7 +66,7 @@ X = tf.placeholder(tf.float32 ,[None ,num_periods ,inputs])
 y = tf.placeholder(tf.float32 ,[None ,num_periods ,output])
 
 #create our RNN object
-basic_cell = tf.contrib.rnn.BasicRNNCell(num_units=hidden , activation=tf.nn.relu)
+basic_cell = tf.contrib.rnn.BasicLSTMCell(num_units=hidden , activation=tf.nn.relu)
 
 #create dynamic over static
 rnn_output ,states = tf.nn.dynamic_rnn(basic_cell, X ,dtype=tf.float32)
