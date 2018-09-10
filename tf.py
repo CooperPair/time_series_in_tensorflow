@@ -24,10 +24,18 @@ data = pd.read_csv(sys.argv[1])
 
 #prepearing data for standirisation
 ts = data['Adj Close']
-ts_mean = ts-ts.mean()
-ts_var = ts/ts.var()
+series = Series(ts)
+#prepare data for normalisation
+values = series.values
+values = values.reshape((len(values),1))
+#train normalisaton
+scaler = MinMaxScaler(feature_range=(0,1))
+scaler = scaler.fit(values)
+print('Min: %f, Max: %f' %(scaler.data_min_, scaler.data_max_))
+#normalsiing dataset
+normalized = scaler.transform(values)
 
-TS = np.array(ts)#using data directly without normalising
+TS = np.array(normalized)#using data directly without normalising
 
 
 num_periods = 20
@@ -58,7 +66,7 @@ tf.reset_default_graph()
 
 num_periods = 20
 inputs = 1
-hidden =500     #no of nodes in each hidden layer
+hidden =2048  #no of nodes in each hidden layer try to  be the multiple of 32.
 output = 1
 
 #creating the variable object
@@ -67,7 +75,7 @@ y = tf.placeholder(tf.float32 ,[None ,num_periods ,output])
 
 #create our RNN object
 basic_cell = tf.contrib.rnn.BasicLSTMCell(num_units=hidden , activation=tf.nn.relu)
-
+#basic_cell = tf.contrib.rnn.BasicRNNCell(num_units=hidden , activation=tf.nn.relu)
 #create dynamic over static
 rnn_output ,states = tf.nn.dynamic_rnn(basic_cell, X ,dtype=tf.float32)
 
