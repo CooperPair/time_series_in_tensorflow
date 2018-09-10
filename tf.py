@@ -23,7 +23,7 @@ from pandas import Series
 #input data from the command shell
 data = pd.read_csv(sys.argv[1])
 
-#prepearing data for standirisation
+#prepearing data for standirisation/normalisation
 ts = data['Adj Close']
 series = Series(ts)
 #prepare data for normalisation
@@ -33,14 +33,16 @@ values = values.reshape((len(values),1))
 scaler = MinMaxScaler(feature_range=(0,1))
 
 scaler = scaler.fit(values)
+print(crayons.yellow("\n[*] Minimum and Maximum Value: ", bold=True))
 print('Min: %f, Max: %f' %(scaler.data_min_, scaler.data_max_))
 #normalsiing dataset
 normalized = scaler.transform(values)
 scaler = StandardScaler()
 scaler = scaler.fit(normalized)
+print(crayons.yellow("\n[*] Mean and Standard Deviation after Standarising: ", bold=True))
 print('Mean: %f, StandardDeviaton: %f'%(scaler.mean_, sqrt(scaler.var_)))
 standarized = scaler.transform(normalized)
-TS = np.array(standarized)#
+TS = np.array(standarized)
 
 
 num_periods = 20
@@ -61,8 +63,7 @@ def test_data(series, forecast, num_periods):
 
 X_test , Y_test = test_data(TS, f_horizon, num_periods)
 
-print(Y_test.shape)
-print(Y_test)
+
 y1 = np.reshape(Y_test, 20)#reshape the data into 1-D
 y = pd.Series(y1)#it reshape the data into single dimension data
 
