@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from numpy import mean
 import os
+from math import sqrt
 import matplotlib.pyplot as plt
 import shutil
 import tensorflow.contrib.learn as tflearn
@@ -30,12 +31,16 @@ values = series.values
 values = values.reshape((len(values),1))
 #train normalisaton
 scaler = MinMaxScaler(feature_range=(0,1))
+
 scaler = scaler.fit(values)
 print('Min: %f, Max: %f' %(scaler.data_min_, scaler.data_max_))
 #normalsiing dataset
 normalized = scaler.transform(values)
-
-TS = np.array(normalized)#using data directly without normalising
+scaler = StandardScaler()
+scaler = scaler.fit(normalized)
+print('Mean: %f, StandardDeviaton: %f'%(scaler.mean_, sqrt(scaler.var_)))
+standarized = scaler.transform(normalized)
+TS = np.array(standarized)#
 
 
 num_periods = 20
@@ -66,7 +71,7 @@ tf.reset_default_graph()
 
 num_periods = 20
 inputs = 1
-hidden =2048  #no of nodes in each hidden layer try to  be the multiple of 32.
+hidden =1024 #no of nodes in each hidden layer try to  be the multiple of 32.
 output = 1
 
 #creating the variable object
