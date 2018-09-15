@@ -30,7 +30,7 @@ series = Series(ts)
 values = series.values
 values = values.reshape((len(values),1))
 #train normalisaton
-scaler = MinMaxScaler(feature_range=(0,1))
+scaler = MinMaxScaler(feature_range=(0,0.5))
 
 scaler = scaler.fit(values)
 print(crayons.yellow("\n[*] Minimum and Maximum Value: ", bold=True))
@@ -72,7 +72,7 @@ tf.reset_default_graph()
 
 num_periods = 20
 inputs = 1
-hidden =1024 #no of nodes in each hidden layer try to  be the multiple of 32.
+hidden =512 #no of nodes in each hidden layer try to  be the multiple of 32.
 output = 1
 
 #creating the variable object
@@ -80,8 +80,8 @@ X = tf.placeholder(tf.float32 ,[None ,num_periods ,inputs])
 y = tf.placeholder(tf.float32 ,[None ,num_periods ,output])
 
 #create our RNN object
-basic_cell = tf.contrib.rnn.BasicLSTMCell(num_units=hidden , activation=tf.nn.relu)
-#basic_cell = tf.contrib.rnn.BasicRNNCell(num_units=hidden , activation=tf.nn.relu)
+#basic_cell = tf.contrib.rnn.BasicLSTMCell(num_units=hidden , activation=tf.nn.relu)
+basic_cell = tf.contrib.rnn.BasicRNNCell(num_units=hidden , activation=tf.nn.relu)
 #create dynamic over static
 rnn_output ,states = tf.nn.dynamic_rnn(basic_cell, X ,dtype=tf.float32)
 
@@ -111,7 +111,7 @@ training_op = optimizer.minimize(loss)
 init = tf.global_variables_initializer()
 
 #implementing model on our training data
-epochs = 1000 #forward + backward = 1 epochs
+epochs = 2000 #forward + backward = 1 epochs
 scores = list()
 #tf.Session() it is the graph object
 with tf.Session() as sess:
@@ -133,6 +133,7 @@ with tf.Session() as sess:
 	pred_accuracy = (correct_pred/len(PREDICTED_TRENDS))*100
 	PNL = common.net_pnl(ypred, y1, PREDICTED_TRENDS)
 	net_pnl = round(sum(PNL), 2)
+	
 	print('{} is the number of correct predictions'.format(crayons.red(correct_pred)))
 	print('{} is the number of incorrect predictions'.format(crayons.red(incorrect_pred)))
 	print(crayons.blue("[*] Finding Net PnL."))
